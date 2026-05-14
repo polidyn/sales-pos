@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Totals - Shaved Ice Crew</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+    }
+
+    header {
+      background: #348ceb;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 15px;
+    }
+
+    .panel {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+      font-size: 16px;
+    }
+
+    .button {
+      padding: 14px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #4caf50;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .button:hover {
+      background: #43a047;
+    }
+
+    .summary {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .sale-card {
+      background: #fafafa;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .empty {
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<header>Daily Totals</header>
+<div class="container">
+  <div class="panel">
+    <h2>Item Sales Summary</h2>
+    <div id="summary"></div>
+    <div class="summary">Grand Total: $<span id="grand-total">0.00</span></div>
+  </div>
+  <div class="panel">
+    <h2>Sales History</h2>
+    <div id="history"></div>
+    <button class="button" onclick="window.location.href='index.html'">Back to Sales</button>
+  </div>
+</div>
+<script>
+  function renderTotals() {
+    const history = JSON.parse(localStorage.getItem('salesHistory')) || [];
+    const summaryDiv = document.getElementById('summary');
+    const grandTotalEl = document.getElementById('grand-total');
+
+    if (!history.length) {
+      summaryDiv.innerHTML = '<div class="empty">No sales history found. Save a sale from the main page first.</div>';
+      grandTotalEl.innerText = '0.00';
+      return;
+    }
+
+    const itemTotals = {};
+    let grandTotal = 0;
+
+    history.forEach((record) => {
+      grandTotal += record.total;
+      for (const name in record.items) {
+        const { qty, price } = record.items[name];
+        if (!itemTotals[name]) {
+          itemTotals[name] = { qty: 0, revenue: 0 };
+        }
+        itemTotals[name].qty += qty;
+        itemTotals[name].revenue += qty * price;
+      }
+    });
+
+    grandTotalEl.innerText = grandTotal.toFixed(2);
+
+    let html = '<table><thead><tr><th>Item</th><th>Qty Sold</th><th>Revenue</th></tr></thead><tbody>';
+    for (const name in itemTotals) {
+      html += `<tr><td>${name}</td><td>${itemTotals[name].qty}</td><td>$${itemTotals[name].revenue.toFixed(2)}</td></tr>`;
+    }
+    html += '</tbody></table>';
+    summaryDiv.innerHTML = html;
+
+    renderHistory(history);
+  }
+
+  function deleteSale(index) {
+    const history = JSON.parse(localStorage.getItem('salesHistory')) || [];
+    history.splice(index, 1);
+    localStorage.setItem('salesHistory', JSON.stringify(history));
+    renderTotals();
+  }
+
+  function renderHistory(history) {
+    const historyDiv = document.getElementById('history');
+    if (!history.length) {
+      historyDiv.innerHTML = '<div class="empty">No sales history found.</div>';
+      return;
+    }
+
+    let html = '';
+    history.forEach((record, index) => {
+      let itemsText = '';
+      for (const name in record.items) {
+        itemsText += `${name} x${record.items[name].qty}, `;
+      }
+
+      html += `
+        <div class="sale-card">
+          <strong>${record.time}</strong><br />
+          ${itemsText}<br />
+          <strong>Total: $${record.total.toFixed(2)}</strong><br />
+          <button class="button" onclick="deleteSale(${index})">Delete Sale</button>
+        </div>
+      `;
+    });
+
+    historyDiv.innerHTML = html;
+  }
+
+  renderTotals();
+</script>
+<footer>
+  <p style="text-align: center; font-size: 14px; color:
+#555; margin-top: 20px;">&copy; 2026 Shaved Ice Crew</p>
+</footer>
+</body>
+</html>

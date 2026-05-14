@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shaved Ice Crew</title>
+  <style>
+
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: #f4f4f4;
+    }
+
+    header {
+      background: #348ceb;
+      color: rgb(0, 0, 0);
+      padding: 15px;
+      text-align: center;
+      font-size: 20px;
+      flex: 0 0 auto;
+    }
+
+    .items {
+      font-size: 22px;
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(320px, 34vw);
+      gap: 10px;
+      padding: 10px;
+      max-width: 1200px;
+      margin: auto;
+      flex: 1 0 auto;
+      width: 100%;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 1100px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 580px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    button {
+      padding: 24px 18px;
+      font-size: 20px;
+      border: none;
+      border-radius: 12px;
+      background: #e8f0fe;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .panel {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    .menu-panel button {
+      font-size: 22px;
+      padding: 24px 20px;
+      min-height: 72px;
+      border-radius: 4px;
+    }
+
+    .sales-panel button {
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .total {
+      font-size: 22px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .danger {
+      background: #c32525;
+      color: white;
+      flex: 1;
+      font-size: 16px;
+    }
+
+    .save {
+      background: #1e7421;
+      color: white;
+      flex: 1;
+      font-size: 16px;
+    }
+
+    .item-remove {
+      padding: 6px 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #c32525;
+      color: white;
+      cursor: pointer;
+    }
+
+    .item-remove:hover {
+      background: #9b1f1f;
+    }
+
+  </style>
+</head>
+<body>
+
+<header>🧊Shaved Ice Crew🧊</header>
+
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png"> 
+
+<div class="container">
+
+  <!-- MENU -->
+  <div class="panel menu-panel">
+    <h2 class="items">Items</h2>
+
+    <h3>Ice</h3>
+    <div class="grid">
+        <button onclick="addItem('Shaved Ice', 7)">Shaved Ice [$7]</button>
+        <button onclick="addItem('Snow Cup', 1)">Snow Cup [$1]</button>
+    </div>
+
+    <h3>Drinks</h3>
+    <div class="grid">
+        <button onclick="addItem('Green Bean', 6)">Green Bean [$6]</button>
+        <button onclick="addItem('Soybean', 6)">Soybean [$6]</button>
+    </div>
+
+    <h3>Food</h3>
+    <div class="grid">
+        <button onclick="addItem('Fries', 2)">Fries [$2]</button>
+        <button onclick="addItem('Waffle', 3)">Waffle [$3]</button>
+    </div>
+
+    <h3>Extras</h3>
+    <div class="grid">
+        <button onclick="addItem('$1', 1)">$1</button>
+        <button onclick="addItem('$3', 3)">$5</button>
+    </div>
+  </div>
+
+  <!-- CURRENT SALE -->
+  <div class="panel">
+    <div class="sales-panel"></div>
+    <h2>Current Sale</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="receipt"></tbody>
+    </table>
+
+    <div class="total">Total: $<span id="total">0.00</span></div>
+
+    <div class="actions">
+      <button class="save" onclick="saveSale()">Save Sale</button>
+      <button class="danger" onclick="clearSale()">Clear</button>
+      <button class="save" onclick="window.location.href='totals.html'">View Totals Page</button>
+      <button class="save" onclick="window.location.href='image.html'">View Image</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let sale = {};
+  let history = JSON.parse(localStorage.getItem('salesHistory')) || [];
+
+  function addItem(name, price) {
+    if (!sale[name]) {
+      sale[name] = { qty: 0, price };
+    }
+    sale[name].qty++;
+    render();
+  }
+
+  function render() {
+    const receipt = document.getElementById('receipt');
+    receipt.innerHTML = '';
+
+    let total = 0;
+
+    for (let item in sale) {
+      const { qty, price } = sale[item];
+      const line = qty * price;
+      total += line;
+
+      receipt.innerHTML += `
+        <tr>
+          <td>${item}</td>
+          <td>${qty}</td>
+          <td>$${line.toFixed(2)}</td>
+          <td><button class="item-remove" onclick="deleteItem('${item}')">Remove</button></td>
+        </tr>
+        `;
+        }
+    
+        document.getElementById('total').innerText = total.toFixed(2);
+    }
+
+  function saveSale() {
+    let total = 0;
+    for (let item in sale) {
+      total += sale[item].qty * sale[item].price;
+    }
+
+    const record = {
+      time: new Date().toLocaleString(),
+      items: sale,
+      total
+    };
+
+    history.unshift(record);
+    localStorage.setItem('salesHistory', JSON.stringify(history));
+
+    sale = {};
+    render();
+  }
+
+  function deleteItem(name) {
+    if (!sale[name]) return;
+    sale[name].qty -= 1;
+    if (sale[name].qty <= 0) {
+      delete sale[name];
+    }
+    render();
+  }
+
+  function clearSale() {
+    sale = {};
+    render();
+  }
+
+  render();
+</script>
+
+<footer>
+  <p style="text-align: center; font-size: 14px; color:
+#555; margin-top: 20px;">&copy; 2026 Shaved Ice Crew</p>
+</footer>
+
+</body>
+</html>
