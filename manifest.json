@@ -1,11 +1,16 @@
 {
-  "name": "Shaved Ice Crew Sales Tracker",
+  "name": "Angkor Royal Ice Sales Tracker",
   "short_name": "POS",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f6f8",
   "theme_color": "#4CAF50",
   "icons": [
+     {
+      "src": "icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
     {
       "src": "icon-192.png",
       "sizes": "192x192",
