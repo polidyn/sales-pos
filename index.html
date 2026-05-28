@@ -173,6 +173,11 @@
       background: #9b1f1f;
     }
 
+    .discount-row td {
+      color: #9b1f1f;
+      font-weight: 600;
+    }
+
     .notes {
       font-size: 14px;
       color: #555;
@@ -184,7 +189,7 @@
 <body>
 
 <header>
-  <img src="ari_logo.PNG" alt="Shaved Ice" />
+  <img src="ari_logo.png" alt="Shaved Ice" />
 </header>
 
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
@@ -202,7 +207,7 @@
     <h3>Ice</h3>
     <div class="grid">
         <button onclick="addItem('Shaved Ice', 6)">Shaved Ice</button>
-        <button onclick="addItem('Snow Cup', 2)">Snow Cup</button>
+        <button onclick="addItem('Snow Cup/Cone', 2)">Snow Cup/Cone</button>
     </div>
 
     <h3>Drinks</h3>
@@ -223,11 +228,17 @@
         <button onclick="addItem('$5', 5)">$5</button>
     </div>
 
+    <h3>Discounts</h3>
+    <div class="grid">
+      <button onclick="addItem('$1 Discount', -1)">$1 Discount</button>
+      <button onclick="addItem('$5 Discount', -5)">$5 Discount</button>
+    </div>
+
     <div class="notes">
       <ul style="font-size: 18px; font-weight: bold;">Prices:</ul>
       <ul style="list-style-type: none; padding-left: 0; font-size: 16px;">
         <ul>Shaved Ice: $6 </ul>
-        <ul>Snow Cup: $2</ul>
+        <ul>Snow Cup/Cone: $2</ul>
         <ul>GreenBean/Soybean: $5</ul>
         <ul>Fries: $2</ul>
         <ul>Waffle: $3</ul>
@@ -291,11 +302,15 @@
       const line = qty * price;
       total += line;
 
+      const isDiscount = price < 0;
+      const rowClass = isDiscount ? 'discount-row' : '';
+      const displayLine = isDiscount ? `-$${Math.abs(line).toFixed(2)}` : `$${line.toFixed(2)}`;
+
       receipt.innerHTML += `
-        <tr>
+        <tr class="${rowClass}">
           <td>${item}</td>
           <td>${qty}</td>
-          <td>$${line.toFixed(2)}</td>
+          <td>${displayLine}</td>
           <td><button class="item-remove" onclick="deleteItem('${item}')">Remove</button></td>
         </tr>
         `;
