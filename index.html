@@ -212,6 +212,8 @@
       padding-top: 10px;
     }
 
+    /* Order form modal - removed; using separate page */
+
   </style>
 </head>
 <body>
@@ -247,8 +249,8 @@
 
     <h3>Food</h3>
     <div class="grid">
-        <button onclick="addItem('Fries', 2)">Fries</button>
-        <button onclick="addItem('Waffle', 3)">Waffle</button>
+        <button onclick="addItem('Fries', 3)">Fries</button>
+        <button onclick="addItem('Waffle', 2)">Waffle</button>
     </div>
 
     <h3>Extras</h3>
@@ -277,8 +279,8 @@
     <div class="notes">
         <ul style="font-size: 20px; font-weight: bold; line-height: 0;">Food Prices:</ul>
         <ul style="list-style-type: none; padding-left: 0; font-size: 18px; line-height: 1.2;">
-          <ul>Fries: $2</ul>
-          <ul>Waffle: $3</ul>
+          <ul>Fries: $3</ul>
+          <ul>Waffle: $2</ul>
         </ul>
       </ul>
     </div>
@@ -310,8 +312,9 @@
     <div class="actions">
       <button class="danger" onclick="clearSale()">Clear</button>
       <button class="view" onclick="window.location.href='totals.html'">View Totals Page</button>
-      <button class="view" onclick="window.location.href='image.html'">View Image</button>
+      <button class="view" onclick="window.location.href='order.html'">Order Form</button>
     </div>
+    
   </div>
 
 </div>
@@ -319,6 +322,8 @@
 <script>
   let sale = {};
   let history = JSON.parse(localStorage.getItem('salesHistory')) || [];
+  // try to load pending customer saved from separate order page
+  let currentCustomer = JSON.parse(localStorage.getItem('pendingCustomer')) || {};
 
   function addItem(name, price) {
     if (!sale[name]) {
@@ -362,10 +367,20 @@
       total += sale[item].qty * sale[item].price;
     }
 
+    // capture customer info (prefer stored currentCustomer, fallback to form fields)
+    const custFromForm = {
+      name: (document.getElementById('cust-name') || {}).value || '',
+      address: (document.getElementById('cust-address') || {}).value || '',
+      contact: (document.getElementById('cust-contact') || {}).value || ''
+    };
+
+    const customer = (currentCustomer && (currentCustomer.name || currentCustomer.address || currentCustomer.contact)) ? currentCustomer : custFromForm;
+
     const record = {
       time: new Date().toLocaleString(),
       items: sale,
-      total
+      total,
+      customer
     };
 
     history.unshift(record);
@@ -373,7 +388,14 @@
 
     sale = {};
     render();
+    // clear customer after saving (also remove pendingCustomer from storage)
+    currentCustomer = {};
+    localStorage.removeItem('pendingCustomer');
+    if (document.getElementById('cust-name')) document.getElementById('cust-name').value = '';
+    if (document.getElementById('cust-address')) document.getElementById('cust-address').value = '';
+    if (document.getElementById('cust-contact')) document.getElementById('cust-contact').value = '';
   }
+  
 
   function deleteItem(name) {
     if (!sale[name]) return;
