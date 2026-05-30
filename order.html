@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Form - Shaved Ice Crew</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; background:#f4f4f4 }
+    header { background:#348ceb; color:#fff; padding:12px; text-align:center }
+    .container { max-width:760px; margin:20px auto; padding:12px }
+    .panel { background:#fff; padding:16px; border-radius:10px; margin-bottom:12px }
+    h3 { margin-top:0 }
+    label { display:block; font-weight:600; margin-top:8px }
+    input, textarea { width:100%; padding:8px; border-radius:8px; border:1px solid #ddd; margin-top:6px; box-sizing:border-box }
+    .actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap }
+    .button { padding:10px 14px; border-radius:8px; border:none; cursor:pointer; background:#4caf50; color:#fff }
+    .button.secondary { background:#ccc; color:#111 }
+    .button.danger { background:#c32525 }
+    .saved { color:green; margin-left:8px; font-weight:700 }
+    .customer-card { background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center }
+    .customer-info { flex:1 }
+    .customer-name { font-weight:600 }
+    .customer-detail { font-size:13px; color:#666 }
+    .customer-actions { display:flex; gap:6px }
+    .btn-small { padding:6px 10px; font-size:13px }
+  </style>
+</head>
+<body>
+<header>Order Form</header>
+<div class="container">
+  <div class="panel">
+    <h3>New/Edit Customer</h3>
+    <form id="order-form">
+      <label for="name">Customer Name</label>
+      <input id="name" name="name" type="text" required />
+
+      <label for="address">Address</label>
+      <textarea id="address" name="address" rows="3"></textarea>
+
+      <label for="contact">Contact</label>
+      <input id="contact" name="contact" type="text" />
+
+      <div class="actions">
+        <button class="button" type="submit">Save Customer</button>
+        <button class="button secondary" type="button" onclick="window.location.href='index.html'">Back</button>
+        <div id="saved-msg" class="saved" style="display:none">Saved</div>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>Saved Customers</h3>
+    <div id="customer-list"></div>
+  </div>
+</div>
+<script>
+  const form = document.getElementById('order-form');
+  const savedMsg = document.getElementById('saved-msg');
+  const customerListDiv = document.getElementById('customer-list');
+
+  function getCustomerList() {
+    return JSON.parse(localStorage.getItem('customerList') || '[]');
+  }
+
+  function saveCustomerList(list) {
+    localStorage.setItem('customerList', JSON.stringify(list));
+  }
+
+  function renderCustomerList() {
+    const list = getCustomerList();
+    if (!list.length) {
+      customerListDiv.innerHTML = '<div style="color:#999">No saved customers yet.</div>';
+      return;
+    }
+    customerListDiv.innerHTML = list.map((cust, idx) => `
+      <div class="customer-card">
+        <div class="customer-info">
+          <div class="customer-name">${escapeHtml(cust.name || 'N/A')}</div>
+          <div class="customer-detail">${escapeHtml(cust.address || '')}</div>
+          <div class="customer-detail">${escapeHtml(cust.contact || '')}</div>
+        </div>
+        <div class="customer-actions">
+          <button class="button btn-small" type="button" onclick="selectCustomer(${idx})">Use</button>
+          <button class="button danger btn-small" type="button" onclick="deleteCustomer(${idx})">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function escapeHtml(text) {
+    const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+    return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  function selectCustomer(idx) {
+    const list = getCustomerList();
+    const customer = list[idx];
+    localStorage.setItem('pendingCustomer', JSON.stringify(customer));
+    window.location.href = 'index.html';
+  }
+
+  function deleteCustomer(idx) {
+    if (!confirm('Delete this customer?')) return;
+    const list = getCustomerList();
+    list.splice(idx, 1);
+    saveCustomerList(list);
+    renderCustomerList();
+  }
+
+  // populate if pending exists
+  const pending = JSON.parse(localStorage.getItem('pendingCustomer') || 'null');
+  if (pending) {
+    document.getElementById('name').value = pending.name || '';
+    document.getElementById('address').value = pending.address || '';
+    document.getElementById('contact').value = pending.contact || '';
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const customer = {
+      name: document.getElementById('name').value.trim(),
+      address: document.getElementById('address').value.trim(),
+      contact: document.getElementById('contact').value.trim()
+    };
+    
+    // add to customer list if not already there (or always add as new entry)
+    const list = getCustomerList();
+    list.unshift(customer); // add to top of list
+    saveCustomerList(list);
+    
+    // set as pending for immediate use
+    localStorage.setItem('pendingCustomer', JSON.stringify(customer));
+    
+    // clear form and show confirmation
+    document.getElementById('name').value = '';
+    document.getElementById('address').value = '';
+    document.getElementById('contact').value = '';
+    savedMsg.style.display = 'inline';
+    renderCustomerList();
+    
+    // hide saved message after 2 seconds
+    setTimeout(() => { savedMsg.style.display = 'none'; }, 2000);
+  });
+
+  // initial render
+  renderCustomerList();
+</script>
+</body>
+</html>
