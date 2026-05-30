@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Connect to Google Fonts -->
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+   <!-- Load the Koulen Font -->
+   <link href="https://fonts.googleapis.com/css2?family=Koulen&display=swap" rel="stylesheet">
   <title>Angkor Royal Ice</title>
   <style>
 
@@ -11,8 +18,24 @@
       margin: 0;
     }
 
+    h2 {
+      font-family: 'Koulen', cursive;
+      color: #000000;
+      margin-top: 0;
+      flex: 0 0 auto;
+      font-size: 28px;
+    }
+
+    h3 {
+      font-family: 'Koulen', cursive;
+      color: #000000;
+      margin-bottom: 8px;
+      flex: 0 0 auto;
+      font-size: 20px;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Koulen';
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -33,7 +56,7 @@
     }
 
     header img {
-      height: 80px;
+      height: 120px;
       width: auto;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -49,7 +72,7 @@
     }
 
     .items {
-      font-size: 22px;
+      font-size: 30px;
       margin-top: 0;
       text-align: center;
     }
@@ -84,6 +107,7 @@
     }
 
     button {
+      font-family: 'Koulen', cursive;
       padding: 24px 18px;
       font-size: 20px;
       border: none;
@@ -92,6 +116,9 @@
       flex: 1;
       cursor: pointer;
     }
+
+    /* utility class to force Koulen on specific elements */
+    .koulen { font-family: 'Koulen'; }
 
     button:active {
       transform: scale(0.98);
@@ -179,9 +206,10 @@
     }
 
     .notes {
-      font-size: 14px;
+      font-size: 24px;
       color: #555;
       margin-top: 10px;
+      padding-top: 10px;
     }
 
   </style>
@@ -189,7 +217,7 @@
 <body>
 
 <header>
-  <img src="logo.PNG" alt="Shaved Ice" />
+  <img src="logo.PNG" alt="Shaved Ice" class="header img"/>
 </header>
 
 <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
@@ -205,7 +233,7 @@
   <div class="panel menu-panel">
     <h2 class="items">Items</h2>
 
-    <h3>Ice</h3>
+    <h3>Desserts</h3>
     <div class="grid">
         <button onclick="addItem('Shaved Ice', 6)">Shaved Ice</button>
         <button onclick="addItem('Snow Cup/Cone', 2)">Snow Cup/Cone</button>
@@ -235,17 +263,25 @@
       <button onclick="addItem('$5 Discount', -5)">$5 Discount</button>
     </div>
 
+
+    <!-- NOTES SECTION -->
+
     <div class="notes">
-      <ul style="font-size: 18px; font-weight: bold;">Prices:</ul>
-      <ul style="list-style-type: none; padding-left: 0; font-size: 16px;">
-        <ul>Shaved Ice: $6 </ul>
+      <ul style="font-size: 20px; font-weight: bold; line-height: 0;">Dessert & Drinks Prices:</ul>
+      <ul style="list-style-type: none; padding-left: 0; font-size: 18px; line-height: 1.2;">
+        <ul>Shaved Ice: $6</ul>
         <ul>Snow Cup/Cone: $2</ul>
         <ul>GreenBean/Soybean: $5</ul>
-        <ul>Fries: $2</ul>
-        <ul>Waffle: $3</ul>
       </ul>
     </div>
-
+    <div class="notes">
+        <ul style="font-size: 20px; font-weight: bold; line-height: 0;">Food Prices:</ul>
+        <ul style="list-style-type: none; padding-left: 0; font-size: 18px; line-height: 1.2;">
+          <ul>Fries: $2</ul>
+          <ul>Waffle: $3</ul>
+        </ul>
+      </ul>
+    </div>
   </div>
 
   <!-- CURRENT SALE -->
