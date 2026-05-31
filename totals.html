@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily Totals - Angkor Royal Ice</title>
+  <title>Daily Totals - Shaved Ice Crew</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,8 +14,10 @@
     header {
       background: #348ceb;
       color: white;
-      padding: 15px;
-      text-align: center;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       font-size: 20px;
     }
 
@@ -54,6 +56,8 @@
       color: white;
       cursor: pointer;
       margin-top: 10px;
+      margin-bottom: 20px;
+      margin-left: 10px;
     }
 
     .button:hover {
@@ -81,12 +85,13 @@
   </style>
 </head>
 <body>
-<header>Daily Totals</header>
-  <div class="panel">
-    <h2>Sales History</h2>
+<header>
+  <button class="button" onclick="window.location.href='index.html#current-sale'">Back to Sales</button>
+  <div style="font-weight:bold;">Daily Totals</div>
+</header>
+<h2>Sales History</h2>
     <div id="history"></div>
-    <button class="button" onclick="window.location.href='index.html'">Back to Sales</button>
-  </div>
+<div class="panel">
 <div class="container">
   <div class="panel">
     <h2>Item Sales Summary</h2>
