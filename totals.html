@@ -154,15 +154,21 @@
 
     let html = '';
     history.forEach((record, index) => {
-      let itemsText = '';
+      let itemsHtml = '<ul style="margin: 8px 0 10px 0; padding: 0 0 0 0; list-style: none;">';
       for (const name in record.items) {
-        itemsText += `${name} x${record.items[name].qty}, `;
+        const item = record.items[name];
+        const lineTotal = (item.qty * item.price).toFixed(2);
+        const displayPrice = item.price < 0 ? `-$${Math.abs(item.price).toFixed(2)}` : `$${item.price.toFixed(2)}`;
+        const displayLine = item.price < 0 ? `-$${Math.abs(lineTotal)}` : `$${lineTotal}`;
+        itemsHtml += `<li>${name} x${item.qty}</li>`;
       }
+      itemsHtml += '</ul>';
 
       html += `
         <div class="sale-card">
-          <strong>${record.time}</strong><br />
-          ${itemsText}<br />
+          <strong>Order #${record.orderNumber || index + 1}</strong><br />
+          <strong>${record.time}</strong>
+          ${itemsHtml}
           <strong>Total: $${record.total.toFixed(2)}</strong><br />
           <button class="button" onclick="deleteSale(${index})">Delete Sale</button>
         </div>
