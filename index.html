@@ -219,6 +219,7 @@
 <body>
 
 <header>
+
   <img src="logo.PNG" alt="Shaved Ice" class="header img"/>
 </header>
 
@@ -287,9 +288,10 @@
   </div>
 
   <!-- CURRENT SALE -->
-  <div class="panel">
+  <div class="panel" id="current-sale">
     <div class="sales-panel"></div>
     <h2>Current Sale</h2>
+    <div style="font-size: 28px; color: #000; margin-bottom: 20px; display: inline-block; border: 3px solid #000; padding: 2px 10px; border-radius: 8px;">Order #<span id="orderNumber">1</span></div>
 
     <table>
       <thead>
@@ -304,6 +306,20 @@
     </table>
 
     <div class="total">Total: $<span id="total">0.00</span></div>
+
+    <div style="margin-top: 20px;">
+      <label style="font-size: 18px; display: block; margin-bottom: 8px;">Amount Paid:</label>
+      <div class="grid" style="margin-bottom: 12px;">
+        <button onclick="setAmountPaid(1)" style="padding: 12px; font-size: 16px;">$1</button>
+        <button onclick="setAmountPaid(5)" style="padding: 12px; font-size: 16px;">$5</button>
+        <button onclick="setAmountPaid(10)" style="padding: 12px; font-size: 16px;">$10</button>
+        <button onclick="setAmountPaid(20)" style="padding: 12px; font-size: 16px;">$20</button>
+        <button onclick="setAmountPaid(50)" style="padding: 12px; font-size: 16px;">$50</button>
+      </div>
+      <div style="font-size: 18px; color: #333; margin-bottom: 12px;">Total Paid: $<span id="totalPaid">0.00</span></div>
+      <button onclick="resetAmountPaid()" style="padding: 8px 12px; font-size: 14px; background: #c32525; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 12px;">Reset Amount</button>
+      <div style="font-size: 18px; color: #1e7421; font-weight: bold; margin-top: 12px;">Change: $<span id="change">0.00</span></div>
+    </div>
 
     <div class="actions">
       <button class="save" onclick="saveSale()">Save Sale</button>
@@ -324,6 +340,11 @@
   let history = JSON.parse(localStorage.getItem('salesHistory')) || [];
   // try to load pending customer saved from separate order page
   let currentCustomer = JSON.parse(localStorage.getItem('pendingCustomer')) || {};
+  let orderCounter = parseInt(localStorage.getItem('orderCounter')) || 1;
+  let amountPaid = 0;
+  
+  // Initialize order number display
+  document.getElementById('orderNumber').innerText = orderCounter;
 
   function addItem(name, price) {
     if (!sale[name]) {
@@ -359,7 +380,30 @@
         }
     
         document.getElementById('total').innerText = total.toFixed(2);
+        calculateChange();
     }
+
+  function calculateChange() {
+    const totalElem = document.getElementById('total');
+    const changeElem = document.getElementById('change');
+    const totalPaidElem = document.getElementById('totalPaid');
+    
+    const total = parseFloat(totalElem.innerText) || 0;
+    const change = Math.max(0, amountPaid - total);
+    
+    totalPaidElem.innerText = amountPaid.toFixed(2);
+    changeElem.innerText = change.toFixed(2);
+  }
+
+  function setAmountPaid(amount) {
+    amountPaid += amount;
+    calculateChange();
+  }
+
+  function resetAmountPaid() {
+    amountPaid = 0;
+    calculateChange();
+  }
 
   function saveSale() {
     let total = 0;
@@ -377,6 +421,7 @@
     const customer = (currentCustomer && (currentCustomer.name || currentCustomer.address || currentCustomer.contact)) ? currentCustomer : custFromForm;
 
     const record = {
+      orderNumber: orderCounter,
       time: new Date().toLocaleString(),
       items: sale,
       total,
@@ -385,6 +430,11 @@
 
     history.unshift(record);
     localStorage.setItem('salesHistory', JSON.stringify(history));
+    
+    // Increment and save order counter
+    orderCounter++;
+    localStorage.setItem('orderCounter', orderCounter);
+    document.getElementById('orderNumber').innerText = orderCounter;
 
     sale = {};
     render();
@@ -394,6 +444,8 @@
     if (document.getElementById('cust-name')) document.getElementById('cust-name').value = '';
     if (document.getElementById('cust-address')) document.getElementById('cust-address').value = '';
     if (document.getElementById('cust-contact')) document.getElementById('cust-contact').value = '';
+    amountPaid = 0;
+    calculateChange();
   }
   
 
@@ -408,7 +460,9 @@
 
   function clearSale() {
     sale = {};
+    amountPaid = 0;
     render();
+    calculateChange();
   }
 
   render();
